@@ -37,24 +37,41 @@ func (a *App) OpenImageFile() string {
 		Title: "Open Background Image",
 		Filters: []runtime.FileFilter{
 			{
-				DisplayName: "Images (*.png;*.jpg)",
-				Pattern: "*.png;*.jpg",
+				DisplayName: "Images (*.png;*.jpg;*.gif;*.webp)",
+				Pattern: "*.png;*.jpg;*.gif;*.webp",
 			},
 		},
 	})
 
 	if err != nil || strings.TrimSpace(dir) == "" {
+		runtime.MessageDialog(a.ctx, runtime.MessageDialogOptions{
+			Type: runtime.ErrorDialog,
+			Title: "Internal Error",
+			Message: "Error: Couldn't find the image file",
+		})
 		return ""
 	}
 
 	output := filepath.Ext(dir)
 	input, err := os.ReadFile(dir)
 	if err != nil {
+		runtime.MessageDialog(a.ctx, runtime.MessageDialogOptions{
+			Type: runtime.ErrorDialog,
+			Title: "Internal Error",
+			Message: fmt.Sprintf("Error: Couldn't load %s", filepath.Base(dir)),
+		})
 		return ""
 	}
+
 	err = os.WriteFile("background" + output, input, os.FileMode(0777))
 	if err != nil {
+		runtime.MessageDialog(a.ctx, runtime.MessageDialogOptions{
+			Type: runtime.ErrorDialog,
+			Title: "Internal Error",
+			Message: fmt.Sprintf("Error: Couldn't save %s", filepath.Base(dir)),
+		})
 		return ""
 	}
+
 	return "background" + output
 }
