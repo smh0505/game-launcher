@@ -6,6 +6,10 @@ export function Greet(arg1) {
   return window['go']['main']['App']['Greet'](arg1);
 }
 
+export function InstallGame() {
+  return window['go']['main']['App']['InstallGame']();
+}
+
 export function OpenImageFile() {
   return window['go']['main']['App']['OpenImageFile']();
 }

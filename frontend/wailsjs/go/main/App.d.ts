@@ -3,4 +3,6 @@
 
 export function Greet(arg1:string):Promise<string>;
 
+export function InstallGame():Promise<{[key: string]: string}>;
+
 export function OpenImageFile():Promise<string>;

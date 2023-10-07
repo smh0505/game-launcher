@@ -80,12 +80,12 @@ export default {
         right: 100px;
 
         width: 200px;
-        height: 160px;
+        height: 200px;
         background-color: oklch(20% var(--chroma) var(--hue));
         color: white;
 
         button {
-            margin-top: 4px;
+            margin-top: 8px;
             padding: 8px 12px;
 
             border: none;
