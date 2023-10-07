@@ -34,9 +34,10 @@ func (a *App) Greet(name string) string {
 	return fmt.Sprintf("Hello %s, It's show time!", name)
 }
 
-func (a *App)GetFileDir(title, displayName, pattern, errMsg string) string {
+func (a *App)GetFileDir(title, defaultDir, displayName, pattern, errMsg string) string {
 	dir, _ := runtime.OpenFileDialog(a.ctx, runtime.OpenDialogOptions{
 		Title: title,
+		DefaultDirectory: defaultDir,
 		Filters: []runtime.FileFilter{
 			{
 				DisplayName: displayName,
@@ -59,9 +60,10 @@ func (a *App)GetFileDir(title, displayName, pattern, errMsg string) string {
 func (a *App) OpenImageFile() string {
 	// Get image file
 	dir := a.GetFileDir("Open Background Image", 
+						"",
 						"Images (*.png;*.jpg;*.gif;*.webp)", 
 						"*.png;*jpg;*.gif;*.webp", 
-						"Error: Couldn't find the image file")
+						"Error: Cannot find the image file")
 	if strings.TrimSpace(dir) == "" { return "" }
 
 	// Extract extension
@@ -73,7 +75,7 @@ func (a *App) OpenImageFile() string {
 		runtime.MessageDialog(a.ctx, runtime.MessageDialogOptions{
 			Type: runtime.ErrorDialog,
 			Title: "Internal Error",
-			Message: fmt.Sprintf("Error: Couldn't load %s", filepath.Base(dir)),
+			Message: fmt.Sprintf("Error: Cannot load %s", filepath.Base(dir)),
 		})
 		return ""
 	}
@@ -84,7 +86,7 @@ func (a *App) OpenImageFile() string {
 		runtime.MessageDialog(a.ctx, runtime.MessageDialogOptions{
 			Type: runtime.ErrorDialog,
 			Title: "Internal Error",
-			Message: fmt.Sprintf("Error: Couldn't save %s", filepath.Base(dir)),
+			Message: fmt.Sprintf("Error: Cannot save %s", filepath.Base(dir)),
 		})
 		return ""
 	}
@@ -95,9 +97,10 @@ func (a *App) OpenImageFile() string {
 func (a *App) InstallGame() map[string]string {
 	// Get archive file
 	dir := a.GetFileDir("Install Game", 
+						"",
 						"Archive Files (*.zip;*.rar;*.7z)", 
 						"*.zip;*.rar;*.7z", 
-						"Error: Couldn't find the archive file")
+						"Error: Cannot find the archive file")
 
 	if strings.TrimSpace(dir) == "" { return nil }
 
@@ -111,7 +114,7 @@ func (a *App) InstallGame() map[string]string {
 		runtime.MessageDialog(a.ctx, runtime.MessageDialogOptions{
 			Type: runtime.ErrorDialog,
 			Title: "Internal Error",
-			Message: fmt.Sprintf("Error: Couldn't extract %s into games folder", filepath.Base(dir)),
+			Message: fmt.Sprintf("Error: Cannot extract %s into games folder", filepath.Base(dir)),
 		})
 		return nil
 	}
@@ -130,7 +133,7 @@ func (a *App) InstallGame() map[string]string {
 		runtime.MessageDialog(a.ctx, runtime.MessageDialogOptions{
 			Type: runtime.ErrorDialog,
 			Title: "Internal Error",
-			Message: "Error: Couldn't find any executable file",
+			Message: "Error: Cannot find any executable file",
 		})
 		exe = append(exe, "")
 	}
@@ -153,6 +156,7 @@ func (a *App) SaveMetadata(data interface{}) {
 		return
 	}
 
+	os.Mkdir("games", os.FileMode(0777))
 	if err = os.WriteFile("games/metadata.yml", bytes, os.FileMode(0777)); err != nil {
 		runtime.MessageDialog(a.ctx, runtime.MessageDialogOptions{
 			Type: runtime.ErrorDialog,
@@ -180,6 +184,61 @@ func (a *App) LoadMetadata() interface{} {
 			Title: "Internal Error",
 			Message: "Error: Cannot decode the metadata",
 		})
+		return nil
 	}
 	return data
+}
+
+func (a *App) LocateThumbnail() string {
+	// Get thumbnail file
+	dir := a.GetFileDir("Locate Thumbnail File", 
+						".",
+						"Images (*.png;*.jpg;*.gif;*.webp)", 
+						"*.png;*jpg;*.gif;*.webp", 
+						"Error: Cannot find the image file")
+	if strings.TrimSpace(dir) == "" { return "" }
+
+	// Extract relative path
+	curr, _ := os.Getwd()
+	target, err := filepath.Rel(curr, dir)
+	if err != nil {
+		runtime.MessageDialog(a.ctx, runtime.MessageDialogOptions{
+			Type: runtime.ErrorDialog,
+			Title: "Internal Error",
+			Message: "Error: Image file not located in the current location",
+		})
+		return ""
+	}
+
+	return target
+}
+
+func (a *App) LocateExecutive() string {
+	// Get executive file
+	dir := a.GetFileDir("Locate Executive File", 
+						".",
+						"Executive (*.exe)", 
+						"*.exe", 
+						"Error: Cannot find the executive file")
+	return dir
+}
+
+func (a *App) Start(dir string) {
+	if err := exec.Command(dir).Start(); err != nil {
+		runtime.MessageDialog(a.ctx, runtime.MessageDialogOptions{
+			Type: runtime.ErrorDialog,
+			Title: "Internal Error",
+			Message: fmt.Sprintf("Error: %s", err.Error()),
+		})
+	}
+}
+
+func (a *App) OpenFolder(dir string) {
+	if err := exec.Command("explorer", dir).Start(); err != nil {
+		runtime.MessageDialog(a.ctx, runtime.MessageDialogOptions{
+			Type: runtime.ErrorDialog,
+			Title: "Internal Error",
+			Message: fmt.Sprintf("Error: %s", err.Error()),
+		})
+	}
 }

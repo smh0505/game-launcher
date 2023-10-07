@@ -1,0 +1,9 @@
+@mixin left-bottom($d) {
+    left: $d;
+    bottom: $d;
+}
+
+@mixin right-bottom($d) {
+    right: $d;
+    bottom: $d;
+}

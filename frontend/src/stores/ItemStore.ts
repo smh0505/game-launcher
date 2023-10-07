@@ -3,22 +3,22 @@ import { SaveMetadata, LoadMetadata } from "../../wailsjs/go/main/App.js"
 
 export const useItemStore = defineStore('items', {
     state: () => ({
-        items: [] as Item[]
+        items: [] as Array<Game>
     }),
     actions: {
         addItem(path: string, name: string, link: string) {
-            this.items.push({ image: "", path, name, link })
+            this.items.push({ image: "", path: path, name: name, link: link })
         },
         saveItems() {
             SaveMetadata(this.items)
         },
         loadItems() {
-            LoadMetadata().then(x => this.items = structuredClone(x)).then(_ => console.log(this.items))
+            LoadMetadata().then(x => { if (x) {this.items = structuredClone(x)}})
         }
     }
 })
 
-interface Item {
+type Game = {
     image: string,
     path: string,
     name: string,
