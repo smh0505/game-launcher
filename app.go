@@ -3,7 +3,9 @@ package main
 import (
 	"context"
 	"fmt"
+	"io/fs"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"strings"
 
@@ -74,4 +76,67 @@ func (a *App) OpenImageFile() string {
 	}
 
 	return "background" + output
+}
+
+func (a *App) InstallGame() map[string]string {
+	dir, err := runtime.OpenFileDialog(a.ctx, runtime.OpenDialogOptions{
+		DefaultDirectory: ".",
+		Title: "Install Game",
+		Filters: []runtime.FileFilter{
+			{
+				DisplayName: "Archive Files(*.zip;*.rar;*.7z)",
+				Pattern: "*.zip;*.rar;*.7z",
+			},
+		},
+	})
+
+	if err != nil || strings.TrimSpace(dir) == "" {
+		runtime.MessageDialog(a.ctx, runtime.MessageDialogOptions{
+			Type: runtime.ErrorDialog,
+			Title: "Internal Error",
+			Message: "Error: Couldn't find the archive",
+		})
+		return nil
+	}
+
+	file := filepath.Base(dir)
+	ext := filepath.Ext(file)
+	file = strings.TrimSuffix(file, ext)
+	newDir := filepath.Join("games", file)
+
+	cmd := exec.Command("7z", "x", dir, fmt.Sprintf(`-o%s`, newDir), "-aoa")
+	if err = cmd.Run(); err != nil {
+		runtime.MessageDialog(a.ctx, runtime.MessageDialogOptions{
+			Type: runtime.ErrorDialog,
+			Title: "Internal Error",
+			Message: fmt.Sprintf("Error: Couldn't extract %s into games folder", filepath.Base(dir)),
+		})
+		return nil
+	}
+	
+	exe := []string{}
+	fs.WalkDir(os.DirFS(newDir), ".", func(path string, d fs.DirEntry, err error) error {
+		if err != nil {
+			return fs.SkipDir
+		}
+		if filepath.Ext(path) == ".exe" {
+			exe = append(exe, filepath.Join(newDir, path))
+		}
+		return nil
+	})
+	if len(exe) == 0 {
+		runtime.MessageDialog(a.ctx, runtime.MessageDialogOptions{
+			Type: runtime.ErrorDialog,
+			Title: "Internal Error",
+			Message: "Error: Couldn't find any executable file",
+		})
+		exe = append(exe, "")
+	}
+
+	data := map[string]string{
+		"path": newDir, 
+		"name": file,
+		"link": exe[0],
+	}
+	return data
 }
