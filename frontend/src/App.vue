@@ -37,13 +37,19 @@ export default {
     },
     methods: {
         install() {
-            InstallGame().then(x => { if (x) { this.items.addItem(x.path, x.name, x.link) }})
+            InstallGame().then(x => {
+                if (x) { this.items.addItem(x.path, x.name, x.link) }
+            })
         }
     },
     mounted() {
         this.setting.loadSetting()
+        this.items.loadItems()
 
-        window.addEventListener("beforeunload", this.setting.saveSetting) 
+        window.addEventListener("beforeunload", () => {
+            this.setting.saveSetting()
+            this.items.saveItems()
+        })
     }
 }
 </script>
@@ -66,7 +72,7 @@ export default {
         height: 100%;
 
         background-size: contain;
-        background-position: center;
+        background-position: bottom;
         background-repeat: no-repeat;
         opacity: var(--opacity);
     }

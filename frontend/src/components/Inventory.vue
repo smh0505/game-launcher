@@ -1,13 +1,22 @@
 <template>
     <div id="inventory">
-        <Item v-for="i in 10" :key="i"></Item>
+        <Item v-for="(item, index) in items.items" 
+            :key="index" 
+            :name="item.name" 
+            :path="item.path" 
+            :link="item.link" 
+            :image="item.image"></Item>
     </div>
 </template>
 
 <script lang="ts">
-import Item from './Item.vue';
+import { useItemStore } from '../stores/ItemStore.js'
+import Item from './Item.vue'
 
 export default {
+    data: () => ({
+        items: useItemStore()
+    }),
     components: { Item }
 }
 </script>
