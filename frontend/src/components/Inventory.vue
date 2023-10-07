@@ -1,11 +1,8 @@
 <template>
     <div id="inventory">
-        <Item v-for="(item, index) in items.items" 
-            :key="index" 
-            :name="item.name" 
-            :path="item.path" 
-            :link="item.link" 
-            :image="item.image"></Item>
+        
+        <Item v-for="(_, index) in items.items" :key="index" :index="index"></Item>
+        
     </div>
 </template>
 

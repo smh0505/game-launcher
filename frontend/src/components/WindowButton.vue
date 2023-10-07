@@ -56,7 +56,7 @@ export default {
         display: flex;
         width: 100%;
         height: 100%;
-        transition: background 0.2s ease-out, color 0.2s ease-out;
+        transition: background 0.2s ease, color 0.2s ease;
 
         &:hover {
             background-color: oklch(40% var(--chroma) var(--hue) / 0.5);
@@ -92,7 +92,7 @@ export default {
             border-radius: 8px;
             background-color: transparent;
             color: white;
-            transition: background 0.2s ease-out;
+            transition: background 0.2s ease;
 
             &:hover {
                 background-color: oklch(40% var(--chroma) var(--hue) / 0.5);
@@ -102,5 +102,5 @@ export default {
 }
 
 .v-enter-from, .v-leave-to { opacity: 0; }
-.v-enter-active, .v-leave-active { transition: opacity 0.2s ease-out; }
+.v-enter-active, .v-leave-active { transition: opacity 0.2s ease; }
 </style>

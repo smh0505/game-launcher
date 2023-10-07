@@ -28,7 +28,7 @@ export const useSettingStore = defineStore("setting", {
                 this.chroma = group.chroma ?? 0
                 this.hue = group.hue ?? 0
                 this.opacity = group.opacity ?? 0.5
-                this.background = group.background ?? ""
+                this.background = group.background ? group.background : ""
                 this.setColor()
             }
         }

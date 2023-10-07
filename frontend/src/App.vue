@@ -3,11 +3,11 @@
         <WindowButton></WindowButton>
         <div id="image" :style="getBackground"></div>
         <div id="foreground">
-            <input type="text" v-model="search">
+            <input type="text" id="search-bar" v-model="search">
             <div id="content">
                 <Inventory></Inventory>
             </div>
-            <button @click="install()">
+            <button class="button install" @click="install()">
                 <span class="material-symbols-outlined">post_add</span>
             </button>
         </div>
@@ -39,6 +39,7 @@ export default {
         install() {
             InstallGame().then(x => {
                 if (x) { this.items.addItem(x.path, x.name, x.link) }
+                this.items.saveItems()
             })
         }
     },
@@ -48,13 +49,14 @@ export default {
 
         window.addEventListener("beforeunload", () => {
             this.setting.saveSetting()
-            this.items.saveItems()
         })
     }
 }
 </script>
 
 <style lang="scss">
+@import "./style.scss";
+
 #background {
     --wails-draggable: drag;
 
@@ -89,6 +91,13 @@ export default {
             height: 40px;
         }
 
+        #search-bar {
+            padding-inline: 6px;
+            border: 4px solid oklch(30% var(--chroma) var(--hue));
+            background-color: oklch(50% var(--chroma) var(--hue) / 0.5);
+            font: 16pt "Pretendard-Regular", sans-serif;
+        }
+
         #content {
             position: relative;
             width: 100%;
@@ -96,26 +105,8 @@ export default {
             overflow-y: auto;
         }
 
-        button {
-            position: absolute;
-            left: 24px;
-            bottom: 24px;
-            
-            width: 60px;
-            height: 60px;
-
-            background-color: oklch(55% var(--chroma) var(--hue) / 0.5);
-            color: white;
-            border: none;
-            border-radius: 12px;
-            transition: background 0.2s ease-out, color 0.2s ease-out;
-
-            &:hover {
-                background-color: oklch(20% var(--chroma) var(--hue) / 0.5);
-                color: black;
-            }
-
-            span { font-size: 36pt; }
+        .install {
+            @include left-bottom(24px);
         }
     }
 }
