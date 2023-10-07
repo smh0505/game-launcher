@@ -3,4 +3,5 @@ node_modules
 frontend/dist
 
 background.*
+default.*
 games

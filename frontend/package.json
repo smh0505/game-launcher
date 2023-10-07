@@ -9,7 +9,6 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "localforage": "^1.10.0",
     "pinia": "^2.1.6",
     "vue": "^3.3.4"
   },

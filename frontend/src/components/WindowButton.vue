@@ -33,7 +33,7 @@ export default {
         minimize() { WindowMinimise() },
         close() { Quit() },
         async loadImage() {
-            await OpenImageFile().then(x => this.setting.background = x)
+            await OpenImageFile().then(x => { if (x) { this.setting.background = x }})
         }
     }
 }
