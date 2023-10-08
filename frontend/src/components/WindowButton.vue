@@ -3,16 +3,20 @@
         <a @click="showModal = true"><span class="material-symbols-outlined">settings</span></a>
         <a @click="minimize()"><span class="material-symbols-outlined">minimize</span></a>
         <a id="wb-close" @click="close()"><span class="material-symbols-outlined">close</span></a>
+
         <Teleport to="body">
             <Modal :show="showModal" @close="showModal = false">
                 <template #modal-body>
                     <div class="modal-info">
                         <label>Chroma: {{ setting.chroma }}</label>
                         <input type="range" v-model="setting.chroma" min="0" max="0.4" step="0.001" @input="setting.setColor">
+
                         <label>Hue: {{ setting.hue }}</label>
                         <input type="range" v-model="setting.hue" min="0" max="360" step="1" @input="setting.setColor">
+                        
                         <label>Background Opacity: {{ setting.opacity }}</label>
                         <input type="range" v-model="setting.opacity" min="0" max="1" step="0.002" @input="setting.setColor">
+                        
                         <div id="bg-merge">
                             <label>Merge Background</label>
                             <label>{{ setting.position.toUpperCase() }}</label>
@@ -22,24 +26,12 @@
                                 </button>
                             </div>
                         </div>
+                        
                         <button id="bg-load" @click="loadImage"><span>Load Background Image</span></button>
                     </div>
                 </template>
             </Modal>
         </Teleport>
-        <!--
-        <Transition>
-            <div v-show="isHover" id="wb-setting" @mouseenter="isHover = true" @mouseleave="isHover = false">
-                <input type="range" v-model="setting.chroma" min="0" max="0.4" step="0.001" @input="setting.setColor()">
-                <label>Chroma: {{ setting.chroma }}</label>
-                <input type="range" v-model="setting.hue" min="0" max="360" step="1" @input="setting.setColor()">
-                <label>Hue: {{ setting.hue }}</label>
-                <input type="range" v-model="setting.opacity" min="0" max="1" step="0.001" @input="setting.setColor()">
-                <label>Bg. Opacity: {{ setting.opacity }}</label>
-                <button @click="loadImage()">Load Image</button>
-            </div>
-        </Transition>
-        -->
     </div>
 </template>
 
@@ -110,9 +102,7 @@ export default {
             text-shadow: 0px 0px 12px black;
         }
 
-        &#wb-close:hover {
-            color: red;
-        }
+        &#wb-close:hover { color: red; }
     }
 
     #wb-setting {

@@ -5,3 +5,6 @@ frontend/dist
 background_*.*
 default.*
 games
+thumbnails
+
+readme_template.md

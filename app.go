@@ -68,16 +68,8 @@ func (a *App) OpenImageFile(prev string) string {
 	// Copy file
 	input, _ := os.ReadFile(dir)
 	os.WriteFile(next, input, os.FileMode(0777))
-	
-	// Delete previous file
-	if err := os.Remove(prev); err != nil {
-		runtime.MessageDialog(a.ctx, runtime.MessageDialogOptions{
-			Type: runtime.ErrorDialog,
-			Title: "Internal Error",
-			Message: fmt.Sprintf("Error: %s", err.Error()),
-		})
-	}
 
+	os.Remove(prev)
 	return next
 }
 
@@ -92,7 +84,7 @@ func (a *App) InstallGame() map[string]string {
 
 	// Extract file name and generate new directory
 	file := strings.TrimSuffix(filepath.Base(dir), filepath.Ext(dir))
-	newDir := filepath.Join("games", file)
+	newDir, _ := filepath.Abs(filepath.Join("games", file))
 
 	// Run 7z command
 	cmd := exec.Command("7z", "x", dir, fmt.Sprintf(`-o%s`, newDir), "-aoa")
@@ -138,7 +130,7 @@ func (a *App) LoadMetadata() interface{} {
 	return data
 }
 
-func (a *App) LocateThumbnail() string {
+func (a *App) LocateThumbnail(oldThumb, name string) string {
 	// Get thumbnail file
 	dir := a.GetFileDir("Locate Thumbnail File", 
 						".",
@@ -146,19 +138,27 @@ func (a *App) LocateThumbnail() string {
 						"*.png;*jpg;*.gif;*.webp")
 	if strings.TrimSpace(dir) == "" { return "" }
 
-	// Extract relative path
-	curr, _ := os.Getwd()
-	target, err := filepath.Rel(curr, dir)
-	if err != nil {
+	// Create new file name
+	ext := filepath.Ext(dir)
+	next := fmt.Sprintf("%s_%d%s", name, time.Now().Unix(), ext)
+
+	os.Mkdir("thumbnails", os.FileMode(0777))
+	newThumb := filepath.Join("thumbnails", next)
+
+	// Copy file
+	input, _ := os.ReadFile(dir)
+	os.WriteFile(newThumb, input, os.FileMode(0777))
+	
+	// Delete previous file
+	if err := os.Remove(oldThumb); err != nil {
 		runtime.MessageDialog(a.ctx, runtime.MessageDialogOptions{
 			Type: runtime.ErrorDialog,
 			Title: "Internal Error",
-			Message: "Error: Image file not located in the current location",
+			Message: fmt.Sprintf("Error: %s", err.Error()),
 		})
-		return ""
 	}
 
-	return target
+	return newThumb
 }
 
 func (a *App) LocateExecutive() string {
@@ -168,6 +168,21 @@ func (a *App) LocateExecutive() string {
 						"Executive (*.exe)", 
 						"*.exe")
 	return dir
+}
+
+func (a *App) RenameFolder(name, oldDir, oldExe string) map[string]string {
+	fileDir, _ := filepath.Rel(oldDir, oldExe)
+
+	newDir, _ := filepath.Abs(filepath.Join("games", name))
+	os.Rename(oldDir, newDir)
+
+	newExe, _ := filepath.Abs(filepath.Join(newDir, fileDir))
+
+	return map[string]string{
+		"path": newDir,
+		"name": name,
+		"link": newExe,
+	}
 }
 
 func (a *App) Start(dir string) {
@@ -188,4 +203,21 @@ func (a *App) OpenFolder(dir string) {
 			Message: fmt.Sprintf("Error: %s", err.Error()),
 		})
 	}
+}
+
+func (a *App) DeleteGame(name, dir, thumb string) bool {
+	res, err := runtime.MessageDialog(a.ctx, runtime.MessageDialogOptions{
+		Type: runtime.QuestionDialog,
+		Title: "Warning",
+		Message: fmt.Sprintf("You are about to delete %s.\nDo you want to continue?", name),
+		DefaultButton: "No",
+	})
+	if err != nil { res = "No" }
+
+	if res == "Yes" {
+		os.RemoveAll(dir)
+		os.Remove(thumb)
+		return true
+	}
+	return false
 }
