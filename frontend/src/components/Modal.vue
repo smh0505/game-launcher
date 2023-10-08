@@ -3,7 +3,7 @@
         <div v-if="show" id="modal-mask" @mousedown="$emit('close')">
             <div id="modal-container" @mousedown.stop>
                 <slot name="modal-body"></slot>
-                <button class="button" id="modal-button" @click="$emit('close')">
+                <button id="modal-button" @click="$emit('close')">
                     <span class="material-symbols-outlined">close</span>
                 </button>
             </div>
@@ -23,6 +23,8 @@ export default {
 </script>
 
 <style lang="scss">
+@import "../style.scss";
+
 #modal-mask {
     position: fixed;
     z-index: 999;
@@ -52,8 +54,11 @@ export default {
 }
 
 #modal-button {
+    position: absolute;
+    @include button(60px, 60px, 36pt);
     bottom: 30px;
     right: 40px;
+    transition: background 0.2s ease;
 }
 
 .modal-enter-from, .modal-leave-to {

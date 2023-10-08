@@ -8,6 +8,7 @@ import (
 	"os/exec"
 	"path/filepath"
 	"strings"
+	"time"
 
 	"github.com/goccy/go-yaml"
 	"github.com/wailsapp/wails/v2/pkg/runtime"
@@ -29,13 +30,8 @@ func (a *App) startup(ctx context.Context) {
 	a.ctx = ctx
 }
 
-// Greet returns a greeting for the given name
-func (a *App) Greet(name string) string {
-	return fmt.Sprintf("Hello %s, It's show time!", name)
-}
-
-func (a *App)GetFileDir(title, defaultDir, displayName, pattern, errMsg string) string {
-	dir, _ := runtime.OpenFileDialog(a.ctx, runtime.OpenDialogOptions{
+func (a *App)GetFileDir(title, defaultDir, displayName, pattern string) string {
+	dir, err := runtime.OpenFileDialog(a.ctx, runtime.OpenDialogOptions{
 		Title: title,
 		DefaultDirectory: defaultDir,
 		Filters: []runtime.FileFilter{
@@ -46,52 +42,43 @@ func (a *App)GetFileDir(title, defaultDir, displayName, pattern, errMsg string) 
 		},
 	})
 
-	if strings.TrimSpace(dir) == "" {
+	if err != nil {
 		runtime.MessageDialog(a.ctx, runtime.MessageDialogOptions{
 			Type: runtime.ErrorDialog,
 			Title: "Internal Error",
-			Message: errMsg,
+			Message: fmt.Sprintf("Error: %s", err.Error()),
 		})
 	}
 
 	return dir
 }
 
-func (a *App) OpenImageFile() string {
+func (a *App) OpenImageFile(prev string) string {
 	// Get image file
 	dir := a.GetFileDir("Open Background Image", 
 						"",
 						"Images (*.png;*.jpg;*.gif;*.webp)", 
-						"*.png;*jpg;*.gif;*.webp", 
-						"Error: Cannot find the image file")
+						"*.png;*jpg;*.gif;*.webp")
 	if strings.TrimSpace(dir) == "" { return "" }
 
-	// Extract extension
+	// Create new file name
 	output := filepath.Ext(dir)
-
-	// Read file
-	input, err := os.ReadFile(dir)
-	if err != nil {
-		runtime.MessageDialog(a.ctx, runtime.MessageDialogOptions{
-			Type: runtime.ErrorDialog,
-			Title: "Internal Error",
-			Message: fmt.Sprintf("Error: Cannot load %s", filepath.Base(dir)),
-		})
-		return ""
-	}
+	next := fmt.Sprintf("background_%d%s", time.Now().Unix(), output)
 
 	// Copy file
-	err = os.WriteFile("background" + output, input, os.FileMode(0777))
-	if err != nil {
+	input, _ := os.ReadFile(dir)
+	os.WriteFile(next, input, os.FileMode(0777))
+	
+	// Delete previous file
+	if err := os.Remove(prev); err != nil {
 		runtime.MessageDialog(a.ctx, runtime.MessageDialogOptions{
 			Type: runtime.ErrorDialog,
 			Title: "Internal Error",
-			Message: fmt.Sprintf("Error: Cannot save %s", filepath.Base(dir)),
+			Message: fmt.Sprintf("Error: %s", err.Error()),
 		})
-		return ""
 	}
 
-	return "background" + output
+	return next
 }
 
 func (a *App) InstallGame() map[string]string {
@@ -99,8 +86,7 @@ func (a *App) InstallGame() map[string]string {
 	dir := a.GetFileDir("Install Game", 
 						"",
 						"Archive Files (*.zip;*.rar;*.7z)", 
-						"*.zip;*.rar;*.7z", 
-						"Error: Cannot find the archive file")
+						"*.zip;*.rar;*.7z")
 
 	if strings.TrimSpace(dir) == "" { return nil }
 
@@ -114,7 +100,7 @@ func (a *App) InstallGame() map[string]string {
 		runtime.MessageDialog(a.ctx, runtime.MessageDialogOptions{
 			Type: runtime.ErrorDialog,
 			Title: "Internal Error",
-			Message: fmt.Sprintf("Error: Cannot extract %s into games folder", filepath.Base(dir)),
+			Message: fmt.Sprintf("Error: Cannot extract %s into games folder\n%s", filepath.Base(dir), err.Error()),
 		})
 		return nil
 	}
@@ -128,13 +114,7 @@ func (a *App) InstallGame() map[string]string {
 		}
 		return nil
 	})
-
 	if len(exe) == 0 {
-		runtime.MessageDialog(a.ctx, runtime.MessageDialogOptions{
-			Type: runtime.ErrorDialog,
-			Title: "Internal Error",
-			Message: "Error: Cannot find any executable file",
-		})
 		exe = append(exe, "")
 	}
 
@@ -146,46 +126,15 @@ func (a *App) InstallGame() map[string]string {
 }
 
 func (a *App) SaveMetadata(data interface{}) {
-	bytes, err := yaml.Marshal(data)
-	if err != nil {
-		runtime.MessageDialog(a.ctx, runtime.MessageDialogOptions{
-			Type: runtime.ErrorDialog,
-			Title: "Internal Error",
-			Message: "Error: Cannot encode the metadata",
-		})
-		return
-	}
-
+	bytes, _ := yaml.Marshal(data)
 	os.Mkdir("games", os.FileMode(0777))
-	if err = os.WriteFile("games/metadata.yml", bytes, os.FileMode(0777)); err != nil {
-		runtime.MessageDialog(a.ctx, runtime.MessageDialogOptions{
-			Type: runtime.ErrorDialog,
-			Title: "Internal Error",
-			Message: "Error: Cannot write the metadata into a file",
-		})
-	}
+	os.WriteFile("games/metadata.yml", bytes, os.FileMode(0777))
 }
 
 func (a *App) LoadMetadata() interface{} {
-	bytes, err := os.ReadFile("games/metadata.yml")
-	if err != nil {
-		runtime.MessageDialog(a.ctx, runtime.MessageDialogOptions{
-			Type: runtime.ErrorDialog,
-			Title: "Internal Error",
-			Message: "Error: Cannot read the metadata",
-		})
-		return nil
-	}
-
+	bytes, _ := os.ReadFile("games/metadata.yml")
 	var data interface{}
-	if err = yaml.Unmarshal(bytes, &data); err != nil {
-		runtime.MessageDialog(a.ctx, runtime.MessageDialogOptions{
-			Type: runtime.ErrorDialog,
-			Title: "Internal Error",
-			Message: "Error: Cannot decode the metadata",
-		})
-		return nil
-	}
+	yaml.Unmarshal(bytes, &data)
 	return data
 }
 
@@ -194,8 +143,7 @@ func (a *App) LocateThumbnail() string {
 	dir := a.GetFileDir("Locate Thumbnail File", 
 						".",
 						"Images (*.png;*.jpg;*.gif;*.webp)", 
-						"*.png;*jpg;*.gif;*.webp", 
-						"Error: Cannot find the image file")
+						"*.png;*jpg;*.gif;*.webp")
 	if strings.TrimSpace(dir) == "" { return "" }
 
 	// Extract relative path
@@ -218,8 +166,7 @@ func (a *App) LocateExecutive() string {
 	dir := a.GetFileDir("Locate Executive File", 
 						".",
 						"Executive (*.exe)", 
-						"*.exe", 
-						"Error: Cannot find the executive file")
+						"*.exe")
 	return dir
 }
 

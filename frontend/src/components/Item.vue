@@ -2,7 +2,7 @@
     <div class="item" @mouseenter="isHover = true" @mouseleave="isHover = false" @click="startGame">
         <div class="item-bg" :style="getBackground"></div>
         <div class="item-name">{{ getItem.name }}</div>
-        <button v-show="isHover" class="button item-edit" @click.stop="showModal = true">
+        <button v-show="isHover" class="item-edit" @click.stop="showModal = true">
             <span class="material-symbols-outlined">feature_search</span>
         </button>
         <Teleport to="body">
@@ -11,16 +11,16 @@
                     <div class="modal-info">
                         <img class="thumbnail" :src="getItem.image ? getItem.image : 'default.png'" title="Thumbnail" draggable="false">
                         <div class="game-row">
-                            <input class="game-input" type="text" v-model="getItem.image" placeholder="Game Thumbnail" style="text-overflow: ellipsis;" readonly>
+                            <input class="game-input readonly" type="text" v-model="getItem.image" placeholder="Game Thumbnail" readonly>
                             <a @click="loadThumbnail"><span class="material-symbols-outlined">edit_square</span></a>
                         </div>
                         <input class="game-input" type="text" v-model="getItem.name" placeholder="Game Name">
                         <div class="game-row">
-                            <input class="game-input" type="text" v-model="getItem.path" placeholder="Game Path" style="text-overflow: ellipsis;" readonly>
+                            <input class="game-input readonly" type="text" v-model="getItem.path" placeholder="Game Path" readonly>
                             <a @click="openDir"><span class="material-symbols-outlined">folder_open</span></a>
                         </div>
                         <div class="game-row">
-                            <input class="game-input" type="text" v-model="getItem.link" placeholder="Game Link" style="text-overflow: ellipsis;" readonly>
+                            <input class="game-input readonly" type="text" v-model="getItem.link" placeholder="Game Link" readonly>
                             <a @click="loadExe"><span class="material-symbols-outlined">edit_square</span></a>
                         </div>
                     </div>
@@ -109,12 +109,15 @@ export default {
         text-overflow: ellipsis;
 
         color: white;
-        text-shadow: 4px 4px 12px black, -4px -4px 12px black;
+        text-shadow: 1px 1px 6px black, -1px -1px 6px black;
         user-select: none;
     }
 
     .item-edit {
+        position: absolute;
+        @include button(60px, 60px, 36pt);
         @include right-bottom(12px);
+        transition: background 0.2s ease;
     }
 }
 
@@ -160,9 +163,8 @@ export default {
         transition: box-shadow 0.2s ease;
         cursor: default !important;
 
-        &:focus {
-            box-shadow: 1px 1px 4px black, -1px -1px 4px black;
-        }
+        &:focus { box-shadow: 1px 1px 4px black, -1px -1px 4px black; }
+        &.readonly { text-overflow: ellipsis; }
     }
 }
 </style>

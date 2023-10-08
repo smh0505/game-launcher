@@ -7,3 +7,21 @@
     right: $d;
     bottom: $d;
 }
+
+@mixin button($w, $h, $f) {
+    width: $w;
+    height: $h;
+
+    background-color: oklch(55% var(--chroma) var(--hue) / 0.7);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    box-shadow: 0px 0px 12px black;
+    user-select: none;
+    
+    span { font-size: $f; }
+
+    &:hover {
+        background-color: oklch(20% var(--chroma) var(--hue) / 0.7);
+    }
+}
