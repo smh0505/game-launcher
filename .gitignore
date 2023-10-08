@@ -2,6 +2,6 @@ build/bin
 node_modules
 frontend/dist
 
-background.*
+background_*.*
 default.*
 games

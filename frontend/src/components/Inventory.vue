@@ -1,8 +1,6 @@
 <template>
     <div id="inventory">
-        
         <Item v-for="(_, index) in items.items" :key="index" :index="index"></Item>
-        
     </div>
 </template>
 

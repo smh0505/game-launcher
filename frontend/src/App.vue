@@ -1,13 +1,13 @@
 <template>
     <div id="background">
         <WindowButton></WindowButton>
-        <div id="image" :style="getBackground"></div>
+        <div id="image"></div>
         <div id="foreground">
-            <input type="text" id="search-bar" v-model="search">
+            <!--<input type="text" id="search-bar" v-model="search">-->
             <div id="content">
                 <Inventory></Inventory>
             </div>
-            <button class="button install" @click="install()">
+            <button id="install" @click="install()">
                 <span class="material-symbols-outlined">post_add</span>
             </button>
         </div>
@@ -28,13 +28,6 @@ export default {
         search: ""
     }),
     components: { WindowButton, Inventory },
-    computed: {
-        getBackground() {
-            return {
-                "background-image": `url(${this.setting.background})`
-            }
-        }
-    },
     methods: {
         install() {
             InstallGame().then(x => {
@@ -47,9 +40,7 @@ export default {
         this.setting.loadSetting()
         this.items.loadItems()
 
-        window.addEventListener("beforeunload", () => {
-            this.setting.saveSetting()
-        })
+        window.addEventListener("beforeunload", this.setting.saveSetting)
     }
 }
 </script>
@@ -63,18 +54,15 @@ export default {
     width: 100vw;
     height: 100vh;
     background-color: oklch(70% var(--chroma) var(--hue) / 0.5);
-    background-size: contain;
-    background-position: center;
-    background-repeat: no-repeat;
-    background-blend-mode: multiply;
 
     #image {
         position: absolute;
         width: 100%;
         height: 100%;
 
+        background-image: var(--background);
         background-size: contain;
-        background-position: bottom;
+        background-position: var(--position);
         background-repeat: no-repeat;
         opacity: var(--opacity);
     }
@@ -99,14 +87,18 @@ export default {
         }
 
         #content {
-            position: relative;
+            position: absolute;
+            bottom: 0px;
             width: 100%;
             height: calc(100% - 40px);
             overflow-y: auto;
         }
 
-        .install {
+        #install {
+            position: absolute;
+            @include button(60px, 60px, 36pt);
             @include left-bottom(24px);
+            transition: background 0.2s ease;
         }
     }
 }
