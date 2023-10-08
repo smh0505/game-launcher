@@ -1,28 +1,33 @@
 <template>
     <div class="item" @mouseenter="isHover = true" @mouseleave="isHover = false" @click="startGame">
-        <div class="item-bg" :style="getBackground"></div>
+        <img class="item-bg" :src="getItem.image ? getItem.image : 'default.png'" title="Thumbnail" :style="getBackground" draggable="false">
         <div class="item-name">{{ getItem.name }}</div>
         <button v-show="isHover" class="item-edit" @click.stop="showModal = true">
             <span class="material-symbols-outlined">feature_search</span>
         </button>
+
         <Teleport to="body">
             <Modal :show="showModal" @close="check">
                 <template #modal-body>
                     <div class="modal-info">
-                        <img class="thumbnail" :src="getItem.image ? getItem.image : 'default.png'" title="Thumbnail" draggable="false">
-                        <div class="game-row">
-                            <input class="game-input readonly" type="text" v-model="getItem.image" placeholder="Game Thumbnail" readonly>
-                            <a @click="loadThumbnail"><span class="material-symbols-outlined">edit_square</span></a>
-                        </div>
+                        <img class="thumbnail" :src="getItem.image ? getItem.image : 'default.png'" 
+                            @click="loadThumbnail" title="Thumbnail" draggable="false">
+
                         <input class="game-input" type="text" v-model="getItem.name" placeholder="Game Name">
+
                         <div class="game-row">
                             <input class="game-input readonly" type="text" v-model="getItem.path" placeholder="Game Path" readonly>
                             <a @click="openDir"><span class="material-symbols-outlined">folder_open</span></a>
                         </div>
+
                         <div class="game-row">
                             <input class="game-input readonly" type="text" v-model="getItem.link" placeholder="Game Link" readonly>
                             <a @click="loadExe"><span class="material-symbols-outlined">edit_square</span></a>
                         </div>
+
+                        <button class="game-delete" @click="remove()">
+                            <span class="material-symbols-outlined">delete_forever</span>
+                        </button>
                     </div>
                 </template>
             </Modal>
@@ -33,7 +38,7 @@
 <script lang="ts">
 import Modal from './Modal.vue'
 import { useItemStore } from '../stores/ItemStore.js'
-import { LocateThumbnail, LocateExecutive, Start, OpenFolder } from '../../wailsjs/go/main/App.js'
+import * as GoFunc from '../../wailsjs/go/main/App.js'
 
 export default {
     props: {
@@ -49,25 +54,36 @@ export default {
     }),
     computed: {
         getItem() { return this.items.items[this.index] },
-        getBackground() {
-            return {
-                "background-image": `url(${this.getItem.image ? this.getItem.image : "default.png"})`,
-                opacity: this.isHover ? "100%" : "50%"
-            };
-        },
+        getBackground() { return { opacity: this.isHover ? "100%" : "50%" } },
     },
     components: { Modal },
     methods: {
         check() {
-            if (this.getItem.name && this.getItem.path) {
+            if (this.getItem.name && this.items.checkUnique(this.getItem.name)) {
                 this.showModal = false
-                this.items.saveItems()
+                if (this.getItem.path.substring(6) !== this.getItem.name) {
+                    GoFunc.RenameFolder(this.getItem.name, this.getItem.path, this.getItem.link)
+                        .then(x => {
+                            this.getItem.path = x.path
+                            this.getItem.link = x.link
+                        })
+                        .then(this.items.saveItems)
+                }
             }
         },
-        loadThumbnail() { LocateThumbnail().then(x => { if (x) { this.getItem.image = x }})},
-        loadExe() { LocateExecutive().then(x => { if (x) { this.getItem.link = x }})},
-        openDir() { OpenFolder(this.getItem.path) },
-        startGame() { Start(this.getItem.link) }
+        remove() {
+            this.showModal = false
+            GoFunc.DeleteGame(this.getItem.name, this.getItem.path, this.getItem.image)
+                .then(x => { if (x) { this.items.items.splice(this.index, 1) } })
+                .then(this.items.saveItems)
+        },
+        loadThumbnail() {
+            GoFunc.LocateThumbnail(this.getItem.image, this.getItem.name)
+                .then(x => { if (x) { this.getItem.image = x } })
+        },
+        loadExe() { GoFunc.LocateExecutive().then(x => { if (x) { this.getItem.link = x }})},
+        openDir() { GoFunc.OpenFolder(this.getItem.path) },
+        startGame() { GoFunc.Start(this.getItem.link) }
     }
 }
 </script>
@@ -91,9 +107,7 @@ export default {
         width: 100%;
         height: 100%;
 
-        background-size: cover;
-        background-position: center;
-        background-repeat: no-repeat;
+        object-fit: cover;
         transition: opacity 0.2s ease;
     }
 
@@ -165,6 +179,14 @@ export default {
 
         &:focus { box-shadow: 1px 1px 4px black, -1px -1px 4px black; }
         &.readonly { text-overflow: ellipsis; }
+    }
+
+    .game-delete {
+        @include button(60px, 60px, 36pt);
+        position: absolute;
+        bottom: 30px;
+        left: 40px;
+        transition: background 0.2s ease;
     }
 }
 </style>

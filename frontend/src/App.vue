@@ -57,8 +57,9 @@ export default {
 
     #image {
         position: absolute;
+        bottom: 0px;
         width: 100%;
-        height: 100%;
+        height: calc(100% - 40px);
 
         background-image: var(--background);
         background-size: contain;

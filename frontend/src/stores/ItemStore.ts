@@ -9,6 +9,9 @@ export const useItemStore = defineStore('items', {
         addItem(path: string, name: string, link: string) {
             this.items.push({ image: "", path: path, name: name, link: link })
         },
+        checkUnique(name: string) {
+            return this.items.filter(x => x.name === name).length === 1
+        },
         saveItems() {
             SaveMetadata(this.items)
         },
