@@ -39,7 +39,6 @@ export default {
     mounted() {
         this.setting.loadSetting()
         this.items.loadItems()
-
         window.addEventListener("beforeunload", this.setting.saveSetting)
     }
 }
@@ -91,6 +90,8 @@ export default {
             width: 100%;
             height: calc(100% - 40px);
             overflow-y: auto;
+
+            &::-webkit-scrollbar { display: none; }
         }
 
         #install {

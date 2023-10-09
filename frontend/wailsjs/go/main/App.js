@@ -18,8 +18,8 @@ export function LoadMetadata() {
   return window['go']['main']['App']['LoadMetadata']();
 }
 
-export function LocateExecutive() {
-  return window['go']['main']['App']['LocateExecutive']();
+export function LocateExecutive(arg1) {
+  return window['go']['main']['App']['LocateExecutive'](arg1);
 }
 
 export function LocateThumbnail(arg1, arg2) {
