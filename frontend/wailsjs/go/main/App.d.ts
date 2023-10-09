@@ -9,7 +9,7 @@ export function InstallGame():Promise<{[key: string]: string}>;
 
 export function LoadMetadata():Promise<any>;
 
-export function LocateExecutive():Promise<string>;
+export function LocateExecutive(arg1:string):Promise<string>;
 
 export function LocateThumbnail(arg1:string,arg2:string):Promise<string>;
 

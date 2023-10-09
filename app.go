@@ -133,7 +133,7 @@ func (a *App) LoadMetadata() interface{} {
 func (a *App) LocateThumbnail(oldThumb, name string) string {
 	// Get thumbnail file
 	dir := a.GetFileDir("Locate Thumbnail File", 
-						".",
+                        "",
 						"Images (*.png;*.jpg;*.gif;*.webp)", 
 						"*.png;*jpg;*.gif;*.webp")
 	if strings.TrimSpace(dir) == "" { return "" }
@@ -149,22 +149,14 @@ func (a *App) LocateThumbnail(oldThumb, name string) string {
 	input, _ := os.ReadFile(dir)
 	os.WriteFile(newThumb, input, os.FileMode(0777))
 	
-	// Delete previous file
-	if err := os.Remove(oldThumb); err != nil {
-		runtime.MessageDialog(a.ctx, runtime.MessageDialogOptions{
-			Type: runtime.ErrorDialog,
-			Title: "Internal Error",
-			Message: fmt.Sprintf("Error: %s", err.Error()),
-		})
-	}
-
+	os.Remove(oldThumb)
 	return newThumb
 }
 
-func (a *App) LocateExecutive() string {
+func (a *App) LocateExecutive(pos string) string {
 	// Get executive file
 	dir := a.GetFileDir("Locate Executive File", 
-						".",
+						pos,
 						"Executive (*.exe)", 
 						"*.exe")
 	return dir
@@ -196,13 +188,7 @@ func (a *App) Start(dir string) {
 }
 
 func (a *App) OpenFolder(dir string) {
-	if err := exec.Command("explorer", dir).Start(); err != nil {
-		runtime.MessageDialog(a.ctx, runtime.MessageDialogOptions{
-			Type: runtime.ErrorDialog,
-			Title: "Internal Error",
-			Message: fmt.Sprintf("Error: %s", err.Error()),
-		})
-	}
+	exec.Command("explorer", dir).Start()
 }
 
 func (a *App) DeleteGame(name, dir, thumb string) bool {

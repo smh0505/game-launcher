@@ -82,7 +82,7 @@ export default {
             GoFunc.LocateThumbnail(this.getItem.image, this.getItem.name)
                 .then(x => { if (x) { this.getItem.image = x } })
         },
-        loadExe() { GoFunc.LocateExecutive().then(x => { if (x) { this.getItem.link = x }})},
+        loadExe() { GoFunc.LocateExecutive(this.getItem.path).then(x => { if (x) { this.getItem.link = x }})},
         openDir() { GoFunc.OpenFolder(this.getItem.path) },
         startGame() { GoFunc.Start(this.getItem.link) }
     }

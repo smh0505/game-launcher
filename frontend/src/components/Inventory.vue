@@ -20,6 +20,7 @@ export default {
     components: { Item, draggable },
     methods: {
         resolveIndex() {
+            this.items.items.forEach((x, index) => x.id = index)
             this.items.saveItems()
         }
     }
