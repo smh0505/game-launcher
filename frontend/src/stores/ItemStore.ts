@@ -7,7 +7,7 @@ export const useItemStore = defineStore('items', {
     }),
     actions: {
         addItem(path: string, name: string, link: string) {
-            this.items.push({ image: "", path: path, name: name, link: link })
+            this.items.push({ image: "", path, name, link })
         },
         checkUnique(name: string) {
             return this.items.filter(x => x.name === name).length === 1
@@ -21,7 +21,7 @@ export const useItemStore = defineStore('items', {
     }
 })
 
-type Game = {
+export interface Game {
     image: string,
     path: string,
     name: string,

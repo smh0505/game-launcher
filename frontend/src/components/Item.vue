@@ -5,6 +5,7 @@
         <button v-show="isHover" class="item-edit" @click.stop="showModal = true">
             <span class="material-symbols-outlined">feature_search</span>
         </button>
+        <div class="handle" @click.stop><span class="material-symbols-outlined">open_with</span></div>
 
         <Teleport to="body">
             <Modal :show="showModal" @close="check">
@@ -109,6 +110,7 @@ export default {
 
         object-fit: cover;
         transition: opacity 0.2s ease;
+        user-select: none;
     }
 
     .item-name {
@@ -132,6 +134,22 @@ export default {
         @include button(60px, 60px, 36pt);
         @include right-bottom(12px);
         transition: background 0.2s ease;
+    }
+
+    .handle {
+        display: flex;
+        position: absolute;
+        @include left-bottom(0px);
+
+        width: 40px;
+        height: 40px;
+
+        background-color: white;
+        border-top: 4px solid oklch(30% var(--chroma) var(--hue));
+        border-right: 4px solid oklch(30% var(--chroma) var(--hue));
+        border-radius: 0px 12px;
+        cursor: default;
+        user-select: none;
     }
 }
 
