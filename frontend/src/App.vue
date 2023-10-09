@@ -1,7 +1,7 @@
 <template>
     <div id="background">
         <WindowButton></WindowButton>
-        <div id="image"></div>
+        <img id="bg-image" :src="setting.background ? setting.background : ''" title="background" draggable="false">
         <div id="foreground">
             <!--<input type="text" id="search-bar" v-model="search">-->
             <div id="content">
@@ -55,16 +55,14 @@ export default {
     height: 100vh;
     background-color: oklch(70% var(--chroma) var(--hue) / 0.5);
 
-    #image {
+    #bg-image {
         position: absolute;
         bottom: 0px;
         width: 100%;
         height: calc(100% - 40px);
 
-        background-image: var(--background);
-        background-size: contain;
-        background-position: var(--position);
-        background-repeat: no-repeat;
+        object-fit: contain;
+        object-position: var(--position);
         opacity: var(--opacity);
     }
 

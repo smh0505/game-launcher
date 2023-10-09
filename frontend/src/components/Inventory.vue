@@ -1,6 +1,6 @@
 <template>
-    <draggable id="inventory" :list="items.items" :group="game" handle=".handle" 
-        item-key="name" animation="200" @end="resolveIndex">
+    <draggable id="inventory" v-model="items.items" :group="game" handle=".handle" 
+        item-key="index" animation="200" @end="resolveIndex">
         <template #item="{_, index}">
             <Item :index="index"></Item>
         </template>
@@ -19,7 +19,9 @@ export default {
     }),
     components: { Item, draggable },
     methods: {
-        resolveIndex() { this.items.saveItems() }
+        resolveIndex() {
+            this.items.saveItems()
+        }
     }
 }
 </script>

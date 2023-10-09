@@ -13,7 +13,6 @@ export const useSettingStore = defineStore("setting", {
             document.documentElement.style.setProperty("--chroma", this.chroma.toString())
             document.documentElement.style.setProperty("--hue", this.hue.toString())
             document.documentElement.style.setProperty("--opacity", this.opacity.toString())
-            document.documentElement.style.setProperty("--background", `url(${this.background})`)
             document.documentElement.style.setProperty("--position", this.position)
         },
         saveSetting() {

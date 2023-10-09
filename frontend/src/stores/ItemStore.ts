@@ -7,10 +7,10 @@ export const useItemStore = defineStore('items', {
     }),
     actions: {
         addItem(path: string, name: string, link: string) {
-            this.items.push({ image: "", path, name, link })
+            this.items.push({ id: this.items.length, image: "", path, name, link })
         },
         checkUnique(name: string) {
-            return this.items.filter(x => x.name === name).length === 1
+            return this.items.filter(x => x.name === name).length < 2
         },
         saveItems() {
             SaveMetadata(this.items)
@@ -21,7 +21,8 @@ export const useItemStore = defineStore('items', {
     }
 })
 
-export interface Game {
+export type Game = {
+    id: number,
     image: string,
     path: string,
     name: string,
