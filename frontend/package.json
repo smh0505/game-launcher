@@ -10,7 +10,8 @@
   },
   "dependencies": {
     "pinia": "^2.1.6",
-    "vue": "^3.3.4"
+    "vue": "^3.3.4",
+    "vuedraggable": "^4.1.0"
   },
   "devDependencies": {
     "@babel/types": "^7.23.0",

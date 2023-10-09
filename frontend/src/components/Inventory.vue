@@ -1,18 +1,26 @@
 <template>
-    <div id="inventory">
-        <Item v-for="(_, index) in items.items" :key="index" :index="index"></Item>
-    </div>
+    <draggable id="inventory" :list="items.items" :group="game" handle=".handle" 
+        item-key="name" animation="200" @end="resolveIndex">
+        <template #item="{_, index}">
+            <Item :index="index"></Item>
+        </template>
+    </draggable>
 </template>
 
 <script lang="ts">
-import { useItemStore } from '../stores/ItemStore.js'
+import draggable from 'vuedraggable'
+import { useItemStore, Game } from '../stores/ItemStore.js'
 import Item from './Item.vue'
 
 export default {
     data: () => ({
-        items: useItemStore()
+        items: useItemStore(),
+        game: {} as Game
     }),
-    components: { Item }
+    components: { Item, draggable },
+    methods: {
+        resolveIndex() { this.items.saveItems() }
+    }
 }
 </script>
 
