@@ -1,15 +1,18 @@
 <template>
     <div id="background">
         <WindowButton></WindowButton>
+        <Sort></Sort>
         <img id="bg-image" :src="setting.background ? setting.background : ''" title="background" draggable="false">
         <div id="foreground">
-            <!--<input type="text" id="search-bar" v-model="search">-->
             <div id="content">
                 <Inventory></Inventory>
             </div>
             <button id="install" @click="install()">
                 <span class="material-symbols-outlined">post_add</span>
             </button>
+            <Transition name="notice">
+                <div v-if="setting.isSaving" id="notice-saving">Saving...</div>
+            </Transition>
         </div>
     </div>
 </template>
@@ -17,6 +20,7 @@
 <script lang="ts">
 import WindowButton from './components/WindowButton.vue'
 import Inventory from './components/Inventory.vue'
+import Sort from './components/Sort.vue'
 import { useSettingStore } from './stores/SettingStore.js'
 import { useItemStore } from './stores/ItemStore.js'
 import { InstallGame } from '../wailsjs/go/main/App.js'
@@ -27,9 +31,10 @@ export default {
         items: useItemStore(),
         search: ""
     }),
-    components: { WindowButton, Inventory },
+    components: { WindowButton, Inventory, Sort },
     methods: {
         install() {
+            this.setting.isSaving = true
             InstallGame().then(x => {
                 if (x) { this.items.addItem(x.path, x.name, x.link) }
                 this.items.saveItems()
@@ -77,13 +82,6 @@ export default {
             height: 40px;
         }
 
-        #search-bar {
-            padding-inline: 6px;
-            border: 4px solid oklch(30% var(--chroma) var(--hue));
-            background-color: oklch(50% var(--chroma) var(--hue) / 0.5);
-            font: 16pt "Pretendard-Regular", sans-serif;
-        }
-
         #content {
             position: absolute;
             bottom: 0px;
@@ -100,6 +98,24 @@ export default {
             @include left-bottom(24px);
             transition: background 0.2s ease;
         }
+
+        #notice-saving {
+            display: flex;
+            position: absolute;
+            @include right-bottom(24px);
+
+            width: 100px;
+            height: 50px;
+
+            font: 14pt "Pretendard-Regular", sans-serif;
+            border-radius: 12px;
+            background-color: oklch(55% var(--chroma) var(--hue) / 0.7);
+            color: white;
+            box-shadow: 0px 0px 12px black;
+        }
     }
 }
+
+.notice-leave-to { opacity: 0; }
+.notice-leave-active { transition: opacity 2s ease; }
 </style>

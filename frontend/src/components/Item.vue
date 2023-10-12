@@ -1,6 +1,7 @@
 <template>
     <div class="item" @mouseenter="isHover = true" @mouseleave="isHover = false" @click="startGame">
         <img class="item-bg" :src="getItem.image ? getItem.image : 'default.png'" title="Thumbnail" :style="getBackground" draggable="false">
+        <div class="item-caption">{{ getItem.code }}</div>
         <div class="item-name">{{ getItem.name }}</div>
         <button v-show="isHover" class="item-edit" @click.stop="showModal = true">
             <span class="material-symbols-outlined">feature_search</span>
@@ -15,6 +16,7 @@
                             @click="loadThumbnail" title="Thumbnail" draggable="false">
 
                         <input class="game-input" type="text" v-model="getItem.name" placeholder="Game Name">
+                        <input class="game-input" type="text" v-model="getItem.code" placeholder="Game Description (ex. Product Number)">
 
                         <div class="game-row">
                             <input class="game-input readonly" type="text" v-model="getItem.path" placeholder="Game Path" readonly>
@@ -38,6 +40,7 @@
 
 <script lang="ts">
 import Modal from './Modal.vue'
+import { useSettingStore } from '../stores/SettingStore.js'
 import { useItemStore } from '../stores/ItemStore.js'
 import * as GoFunc from '../../wailsjs/go/main/App.js'
 
@@ -51,7 +54,8 @@ export default {
     data: () => ({
         isHover: false,
         showModal: false,
-        items: useItemStore()
+        items: useItemStore(),
+        setting: useSettingStore()
     }),
     computed: {
         getItem() { return this.items.items[this.index] },
@@ -62,7 +66,9 @@ export default {
         check() {
             if (this.getItem.name && this.items.checkUnique(this.getItem.name)) {
                 this.showModal = false
-                if (this.getItem.path.substring(6) !== this.getItem.name) {
+                const last = this.getItem.path.substring(this.getItem.path.lastIndexOf('\\'))
+                if (last !== this.getItem.name) {
+                    this.setting.isSaving = true
                     GoFunc.RenameFolder(this.getItem.name, this.getItem.path, this.getItem.link)
                         .then(x => {
                             this.getItem.path = x.path
@@ -92,16 +98,33 @@ export default {
 <style lang="scss">
 @import "../style.scss";
 
+@mixin item-label($top, $left, $width, $color) {
+    position: absolute;
+    top: $top;
+    left: $left;
+    padding: 4px;
+
+    width: $width;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+
+    color: $color;
+    text-shadow: 1px 1px 6px black, -1px -1px 6px black;
+    user-select: none;
+}
+
 .item {
     --wails-draggable: none;
 
+    display: block;
     position: relative;
+    width: 309px;
     height: 200px;
     overflow: hidden;
 
     border-radius: 12px;
     border: 4px solid oklch(30% var(--chroma) var(--hue));
-    // background-color: oklch(50% var(--chroma) var(--hue) / 0.5);
     font: 16pt "Pretendard-Regular", sans-serif; 
 
     .item-bg {
@@ -113,20 +136,13 @@ export default {
         user-select: none;
     }
 
+    .item-caption {
+        @include item-label(0px, 0px, 300px, yellow);
+        font: 12pt "Pretendard-Regular", sans-serif;
+    }
+
     .item-name {
-        position: absolute;
-        top: 0px;
-        left: 0px;
-        padding: 4px;
-
-        width: 300px;
-        overflow: hidden;
-        white-space: nowrap;
-        text-overflow: ellipsis;
-
-        color: white;
-        text-shadow: 1px 1px 6px black, -1px -1px 6px black;
-        user-select: none;
+        @include item-label(16px, 0px, 300px, white)
     }
 
     .item-edit {

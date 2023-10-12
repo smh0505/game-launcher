@@ -6,7 +6,8 @@ export const useSettingStore = defineStore("setting", {
         hue: 0,
         opacity: 0.5,
         background: "",
-        position: "center"
+        position: "center",
+        isSaving: false
     }),
     actions: {
         setColor() {
