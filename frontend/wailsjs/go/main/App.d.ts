@@ -5,7 +5,7 @@ export function DeleteGame(arg1:string,arg2:string,arg3:string):Promise<boolean>
 
 export function GetFileDir(arg1:string,arg2:string,arg3:string,arg4:string):Promise<string>;
 
-export function InstallGame():Promise<{[key: string]: string}>;
+export function InstallGame(arg1:string,arg2:string):Promise<{[key: string]: any}>;
 
 export function LoadMetadata():Promise<any>;
 
@@ -22,3 +22,5 @@ export function RenameFolder(arg1:string,arg2:string,arg3:string):Promise<{[key:
 export function SaveMetadata(arg1:any):Promise<void>;
 
 export function Start(arg1:string):Promise<void>;
+
+export function TestGame(arg1:string,arg2:string):Promise<{[key: string]: any}>;

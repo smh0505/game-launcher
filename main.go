@@ -41,9 +41,8 @@ func main() {
 	// Create application with options
 	err := wails.Run(&options.App{
 		Title:  "browser",
-		Width:  1024,
-		Height: 768,
-		DisableResize: true,
+        MinWidth: 1024,
+		MinHeight: 768,
 		Frameless: true,
 		AssetServer: &assetserver.Options{
 			Assets: assets,

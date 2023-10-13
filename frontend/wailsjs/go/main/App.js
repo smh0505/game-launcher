@@ -10,8 +10,8 @@ export function GetFileDir(arg1, arg2, arg3, arg4) {
   return window['go']['main']['App']['GetFileDir'](arg1, arg2, arg3, arg4);
 }
 
-export function InstallGame() {
-  return window['go']['main']['App']['InstallGame']();
+export function InstallGame(arg1, arg2) {
+  return window['go']['main']['App']['InstallGame'](arg1, arg2);
 }
 
 export function LoadMetadata() {
@@ -44,4 +44,8 @@ export function SaveMetadata(arg1) {
 
 export function Start(arg1) {
   return window['go']['main']['App']['Start'](arg1);
+}
+
+export function TestGame(arg1, arg2) {
+  return window['go']['main']['App']['TestGame'](arg1, arg2);
 }
