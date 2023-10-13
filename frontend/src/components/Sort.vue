@@ -1,12 +1,13 @@
 <template>
     <div id="sort-container">
-        <a @click="items.sortItems('name', isReversed)">Name</a>
-        <a @click="items.sortItems('code', isReversed)">Code</a>
-        <a class="sort-right" @click="isReversed = !isReversed">
+        <a @click="isReversed = !isReversed">
             <span class="material-symbols-outlined">
                 {{ isReversed ? "check_box" : "check_box_outline_blank" }}
             </span>
         </a>
+        <a @click="items.sortItems('name', isReversed)">Name</a>
+        <a @click="items.sortItems('code', isReversed)">Caption</a>
+        <a @click="items.sortItems('isPlayed', isReversed)">Played</a>
     </div>
 </template>
 
@@ -49,11 +50,6 @@ export default {
         &:hover {
             background-color: white;
             color: black;
-        }
-
-        &.sort-right {
-            position: absolute;
-            right: 0px;
         }
     }
 }
