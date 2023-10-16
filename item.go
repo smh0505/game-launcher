@@ -14,11 +14,13 @@ import (
 
 func (a *App) LocateThumbnail(oldThumb, name string) string {
 	// Get thumbnail file
-	dir := a.GetFileDir("Locate Thumbnail File", 
-                        "",
-						"Images (*.png;*.jpg;*.gif;*.webp)", 
-						"*.png;*jpg;*.gif;*.webp")
-	if strings.TrimSpace(dir) == "" { return "" }
+	dir := a.GetFileDir("Locate Thumbnail File", "", []runtime.FileFilter{
+        {
+            DisplayName: "Images (*.png;*.jpg;*.gif;*.webp)",
+            Pattern: "*.png;*jpg;*.gif;*.webp",
+        },
+    })
+    if strings.TrimSpace(dir) == "" { return "" }
 
 	// Create new file name
 	ext := filepath.Ext(dir)
@@ -37,10 +39,12 @@ func (a *App) LocateThumbnail(oldThumb, name string) string {
 
 func (a *App) LocateExecutive(pos string) string {
 	// Get executive file
-	dir := a.GetFileDir("Locate Executive File", 
-						pos,
-						"Executive (*.exe)", 
-						"*.exe")
+	dir := a.GetFileDir("Locate Executive File", pos, []runtime.FileFilter{
+        {
+            DisplayName: "Executive (*.exe)",
+            Pattern: "*.exe",
+        },
+    })
 	return dir
 }
 

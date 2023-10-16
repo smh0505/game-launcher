@@ -6,8 +6,8 @@ export function DeleteGame(arg1, arg2, arg3) {
   return window['go']['main']['App']['DeleteGame'](arg1, arg2, arg3);
 }
 
-export function GetFileDir(arg1, arg2, arg3, arg4) {
-  return window['go']['main']['App']['GetFileDir'](arg1, arg2, arg3, arg4);
+export function GetFileDir(arg1, arg2, arg3) {
+  return window['go']['main']['App']['GetFileDir'](arg1, arg2, arg3);
 }
 
 export function InstallGame(arg1, arg2) {

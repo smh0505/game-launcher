@@ -7,6 +7,8 @@ import (
 	"os/exec"
 	"path/filepath"
 	"strings"
+
+	"github.com/wailsapp/wails/v2/pkg/runtime"
 )
 
 // Enums
@@ -19,10 +21,12 @@ func (a *App) TestGame(dir, pswd string) map[string]any {
     // Get archive file
     newDir := ""
     if strings.TrimSpace(dir) == "" {
-        newDir = a.GetFileDir("Install Game", 
-                            "",
-                            "Archive Files (*.zip;*.rar;*.7z)",
-                            "*.zip;*.rar;*.7z")
+        newDir = a.GetFileDir("Install Game", "", []runtime.FileFilter{
+            {
+                DisplayName: "Archive Files (*.zip;*.rar;*.7z;*.001)",
+                Pattern: "*.zip;*.rar;*.7z;*.001",
+            },
+        })
         if strings.TrimSpace(newDir) == "" { 
             return map[string]any{
                 "dir": newDir,

@@ -9,7 +9,6 @@ import (
 	"strings"
 	"time"
 
-	
 	"github.com/wailsapp/wails/v2/pkg/runtime"
 )
 
@@ -29,26 +28,23 @@ func (a *App) startup(ctx context.Context) {
 	a.ctx = ctx
 }
 
-func (a *App)GetFileDir(title, defaultDir, displayName, pattern string) string {
+func (a *App)GetFileDir(title, defaultDir string, filters []runtime.FileFilter) string {
 	dir, _ := runtime.OpenFileDialog(a.ctx, runtime.OpenDialogOptions{
 		Title: title,
 		DefaultDirectory: defaultDir,
-		Filters: []runtime.FileFilter{
-			{
-				DisplayName: displayName,
-				Pattern: pattern,
-			},
-		},
+		Filters: filters,
 	})
 	return dir
 }
 
 func (a *App) OpenImageFile(prev string) string {
 	// Get image file
-	dir := a.GetFileDir("Open Background Image", 
-						"",
-						"Images (*.png;*.jpg;*.gif;*.webp)", 
-						"*.png;*jpg;*.gif;*.webp")
+	dir := a.GetFileDir("Open Background Image", "", []runtime.FileFilter{
+        {
+            DisplayName: "Images (*.png;*.jpg;*.gif;*.webp)",
+            Pattern: "*.png;*jpg;*.gif;*.webp",
+        },
+    })
 	if strings.TrimSpace(dir) == "" { return "" }
 
 	// Create new file name
@@ -79,11 +75,5 @@ func (a *App) RenameFolder(name, oldDir, oldExe string) map[string]string {
 }
 
 func (a *App) Start(dir string) {
-	if err := exec.Command(dir).Start(); err != nil {
-		runtime.MessageDialog(a.ctx, runtime.MessageDialogOptions{
-			Type: runtime.ErrorDialog,
-			Title: "Internal Error",
-			Message: fmt.Sprintf("Error: %s", err.Error()),
-		})
-	}
+	exec.Command(dir).Start()
 }
