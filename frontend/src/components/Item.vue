@@ -5,7 +5,7 @@
             <img class="item-bg" :src="getItem.image ? getItem.image : 'default.png'" title="Thumbnail" :style="getBackground" draggable="false">
             <div v-if="getItem.code" class="item-caption">{{ getItem.code }}</div>
             <div :style="getTopPos" class="item-name">{{ getItem.name }}</div>
-            <button v-show="isHover" class="item-edit" @click.stop="showModal = true">
+            <button v-show="isHover" class="item-edit" @click.stop="showData = true">
                 <span class="material-symbols-outlined">feature_search</span>
             </button>
             <a class="item-star" @click.stop="items.setIfPlayed(index)">
@@ -16,7 +16,7 @@
         </div>
 
         <Teleport to="body">
-            <Modal :show="showModal" @close="check">
+            <Modal :show="showData" @close="check">
                 <template #modal-body>
                     <div class="modal-info">
                         <img class="thumbnail" :src="getItem.image ? getItem.image : 'default.png'" 
@@ -35,6 +35,20 @@
                             <a @click="loadExe"><span class="material-symbols-outlined">edit_square</span></a>
                         </div>
 
+                        <button class="game-delete" @click="swapModal()">
+                            <span class="material-symbols-outlined">delete_forever</span>
+                        </button>
+                    </div>
+                </template>
+            </Modal>
+            <Modal :show="showDelete" @close="swapModal()">
+                <template #modal-body>
+                    <div class="modal-info">
+                        <h1>Warning</h1>
+                        <p>
+                            You are about to delete <strong>{{ getItem.name }}</strong>.<br>
+                            Do you want to continue?
+                        </p>
                         <button class="game-delete" @click="remove()">
                             <span class="material-symbols-outlined">delete_forever</span>
                         </button>
@@ -60,7 +74,8 @@ export default {
     },
     data: () => ({
         isHover: false,
-        showModal: false,
+        showData: false,
+        showDelete: false,
         items: useItemStore(),
         setting: useSettingStore(),
         isChecked: [
@@ -89,7 +104,7 @@ export default {
     methods: {
         check() {
             if (this.getItem.name && this.items.checkUnique(this.getItem.name)) {
-                this.showModal = false
+                this.showData = false
                 const last = this.getItem.path.substring(this.getItem.path.lastIndexOf('\\'))
                 if (last !== this.getItem.name) {
                     this.setting.isSaving = true
@@ -102,10 +117,14 @@ export default {
                 }
             }
         },
+        swapModal() {
+            this.showData = !this.showData
+            this.showDelete = !this.showDelete
+        },
         remove() {
-            this.showModal = false
-            GoFunc.DeleteGame(this.getItem.name, this.getItem.path, this.getItem.image)
-                .then(x => { if (x) { this.items.items.splice(this.index, 1) } })
+            this.showDelete = false
+            GoFunc.DeleteGame(this.getItem.path, this.getItem.image)
+                .then(() => this.items.items.splice(this.index, 1))
                 .then(this.items.saveItems)
         },
         loadThumbnail() {
@@ -262,51 +281,6 @@ export default {
 }
 
 .modal-info {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-
-    .thumbnail {
-        width: 100%;
-        height: 160px;
-        object-fit: cover;
-
-        border: 2px solid black;
-        border-radius: 8px;
-    }
-
-    .game-row {
-        display: flex;
-        width: 100%;
-        gap: 8px;
-
-        a {
-            display: flex;
-            padding: 4px;
-            border-radius: 8px;
-            transition: background 0.2s ease;
-
-            &:hover {
-                background-color: gray;
-            }
-        }
-    }
-
-    .game-input {
-        width: 100%;
-        height: 32px;
-        font: 16pt "Pretendard-Regular", sans-serif;
-        padding-inline: 6px;
-
-        border: 2px solid black;
-        border-radius: 8px;
-        transition: box-shadow 0.2s ease;
-        cursor: default !important;
-
-        &:focus { box-shadow: 1px 1px 4px black, -1px -1px 4px black; }
-        &.readonly { text-overflow: ellipsis; }
-    }
-
     .game-delete {
         @include button(60px, 60px, 36pt);
         position: absolute;

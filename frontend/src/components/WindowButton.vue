@@ -1,11 +1,12 @@
 <template>
     <div id="wb-container">
-        <a @click="showModal = true"><span class="material-symbols-outlined">settings</span></a>
+        <a @click="showSetting = true"><span class="material-symbols-outlined">settings</span></a>
         <a @click="minimize()"><span class="material-symbols-outlined">minimize</span></a>
-        <a id="wb-close" @click="close()"><span class="material-symbols-outlined">close</span></a>
+        <a @click="maximize()"><span class="material-symbols-outlined">zoom_out_map</span></a>
+        <a id="wb-close" @click="showClose = true"><span class="material-symbols-outlined">close</span></a>
 
         <Teleport to="body">
-            <Modal :show="showModal" @close="showModal = false">
+            <Modal :show="showSetting" @close="showSetting = false">
                 <template #modal-body>
                     <div class="modal-info">
                         <label>Chroma: {{ setting.chroma }}</label>
@@ -31,13 +32,24 @@
                     </div>
                 </template>
             </Modal>
+            <Modal :show="showClose" @close="showClose = false">
+                <template #modal-body>
+                    <div class="modal-info">
+                        <h1>Shutting Down</h1>
+                        <p>Do you want to quit?</p>
+                        <button class="game-delete" @click="close">
+                            <span class="material-symbols-outlined">door_front</span>
+                        </button>
+                    </div>
+                </template>
+            </Modal>
         </Teleport>
     </div>
 </template>
 
 <script lang="ts">
 import { useSettingStore } from '../stores/SettingStore.js'
-import { Quit, WindowMinimise } from '../../wailsjs/runtime/runtime.js'
+import { Quit, WindowMinimise, WindowToggleMaximise } from '../../wailsjs/runtime/runtime.js'
 import { OpenImageFile } from '../../wailsjs/go/main/App.js'
 import Modal from './Modal.vue'
 
@@ -49,7 +61,8 @@ const positions = [
 
 export default {
     data: () => ({
-        showModal: false,
+        showSetting: false,
+        showClose: false,
         setting: useSettingStore(),
         icons: [
             'north_west', 'north', 'north_east',
@@ -58,7 +71,8 @@ export default {
         ]
     }),
     methods: {
-        minimize() { WindowMinimise(); },
+        minimize() { WindowMinimise() },
+        maximize() { WindowToggleMaximise() },
         close() { Quit(); },
         setPosition(i: number) {
             this.setting.position = positions[i]
@@ -80,13 +94,13 @@ export default {
 
 #wb-container {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(4, 1fr);
 
     position: absolute;
     right: 0px;
     z-index: 99;
 
-    width: 150px;
+    width: 200px;
     height: 40px;
     user-select: none;
 
@@ -104,41 +118,9 @@ export default {
 
         &#wb-close:hover { color: red; }
     }
-
-    #wb-setting {
-        --wails-draggable: none;
-
-        display: flex;
-        flex-direction: column;
-
-        position: absolute;
-        top: 40px;
-        right: 100px;
-
-        width: 200px;
-        height: 200px;
-        background-color: oklch(20% var(--chroma) var(--hue));
-        color: white;
-
-        button {
-            margin-top: 8px;
-            padding: 8px 12px;
-
-            border: none;
-            border-radius: 8px;
-            background-color: transparent;
-            color: white;
-            transition: background 0.2s ease;
-
-            &:hover { background-color: oklch(40% var(--chroma) var(--hue) / 0.5); }
-        }
-    }
 }
 
 .modal-info {
-    input[type=range] { width: 100%; }
-    label { font: 16pt "Pretendard-Regular", sans-serif; }
-
     #bg-merge {
         display: flex;
         flex-direction: column;

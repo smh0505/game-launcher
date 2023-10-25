@@ -8,7 +8,7 @@ export const useSettingStore = defineStore("setting", {
         background: "",
         position: "center",
         isSaving: false,
-        isListview: false
+        isListview: false,
     }),
     actions: {
         setColor() {
@@ -24,7 +24,7 @@ export const useSettingStore = defineStore("setting", {
                 opacity: this.opacity,
                 background: this.background,
                 position: this.position,
-                listview: this.isListview
+                listview: this.isListview,
             }))
         },
         loadSetting() {

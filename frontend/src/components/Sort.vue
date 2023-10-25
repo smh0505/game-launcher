@@ -34,7 +34,7 @@ export default {
     justify-content: left;
     z-index: 99;
 
-    width: calc(100% - 150px);
+    width: calc(100% - 200px);
     height: 40px;
 
     border-right: 4px solid oklch(40% var(--chroma) var(--hue));

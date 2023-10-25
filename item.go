@@ -65,19 +65,7 @@ func (a *App) LoadMetadata() interface{} {
 	return data
 }
 
-func (a *App) DeleteGame(name, dir, thumb string) bool {
-	res, err := runtime.MessageDialog(a.ctx, runtime.MessageDialogOptions{
-		Type: runtime.QuestionDialog,
-		Title: "Warning",
-		Message: fmt.Sprintf("You are about to delete %s.\nDo you want to continue?", name),
-		DefaultButton: "No",
-	})
-	if err != nil { res = "No" }
-
-	if res == "Yes" {
-		os.RemoveAll(dir)
-		os.Remove(thumb)
-		return true
-	}
-	return false
+func (a *App) DeleteGame(dir, thumb string) {
+    os.RemoveAll(dir)
+    os.Remove(thumb)
 }

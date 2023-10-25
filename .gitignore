@@ -6,5 +6,6 @@ background_*.*
 default.*
 games
 thumbnails
+config.yml
 
 readme_template.md

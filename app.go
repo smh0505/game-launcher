@@ -3,12 +3,14 @@ package main
 import (
 	"context"
 	"fmt"
+	"log"
 	"os"
 	"os/exec"
 	"path/filepath"
 	"strings"
 	"time"
 
+	"github.com/goccy/go-yaml"
 	"github.com/wailsapp/wails/v2/pkg/runtime"
 )
 
@@ -26,6 +28,39 @@ func NewApp() *App {
 // so we can call the runtime methods
 func (a *App) startup(ctx context.Context) {
 	a.ctx = ctx
+
+    bytes, err := os.ReadFile("config.yml")
+    if err != nil { return }
+
+    var config struct{
+        Width int
+        Height int
+        IsMaximized bool
+    }
+    yaml.Unmarshal(bytes, &config)
+
+    if config.IsMaximized {
+        runtime.WindowMaximise(a.ctx)
+    } else {
+        runtime.WindowSetSize(a.ctx, config.Width, config.Height)
+    }
+}
+
+func (a *App) shutdown(ctx context.Context) bool {
+    var config struct{
+        Width int
+        Height int
+        IsMaximized bool
+    }
+    config.Width, config.Height = runtime.WindowGetSize(a.ctx)
+    config.IsMaximized = runtime.WindowIsMaximised(a.ctx)
+
+    bytes, err := yaml.Marshal(config)
+    if err != nil {
+        log.Fatal(err)
+    }
+    os.WriteFile("config.yml", bytes, os.FileMode(0777))
+    return false
 }
 
 func (a *App)GetFileDir(title, defaultDir string, filters []runtime.FileFilter) string {
