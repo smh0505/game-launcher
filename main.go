@@ -49,6 +49,7 @@ func main() {
 			Handler: NewFileLoader(),
 		},
 		OnStartup: app.startup,
+        OnBeforeClose: app.shutdown,
 		Bind: []interface{}{ app },
 		Windows: &windows.Options{
 			WebviewIsTransparent: true,

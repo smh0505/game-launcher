@@ -7,7 +7,7 @@
             <div id="content">
                 <Inventory></Inventory>
             </div>
-            <button id="install" @click="install()">
+            <button id="install" @click="setting.isSaving ? null : install()">
                 <span class="material-symbols-outlined">post_add</span>
             </button>
             <Transition name="notice">
@@ -85,6 +85,7 @@ export default {
     mounted() {
         this.setting.loadSetting()
         this.items.loadItems()
+
         window.addEventListener("beforeunload", this.setting.saveSetting)
     }
 }
@@ -155,14 +156,6 @@ export default {
             box-shadow: 0px 0px 12px black;
         }
     }
-}
-
-.modal-info {
-    h1 { 
-        font: bold 32pt "Pretendard-Regular", sans-serif; 
-        text-shadow: 2px 2px 4px red, -2px -2px 4px red;
-    }
-    p { font: 16pt "Pretendard-Regular", sans-serif; }
 }
 
 .notice-leave-to { opacity: 0; }

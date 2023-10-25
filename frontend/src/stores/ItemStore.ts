@@ -43,7 +43,7 @@ export const useItemStore = defineStore('items', {
                     const played = partialSort(this.items, IsPlayed.played, reverse)
                     const notPlayed = partialSort(this.items, IsPlayed.notPlayed, reverse)
                     
-                    this.items = reverse ? [...notPlayed, ...played, ...cleared] : [...cleared, ...played, ...notPlayed]
+                    this.items = [...notPlayed, ...played, ...cleared]
             }
             this.items.forEach((x, id) => x.id = id)
             useSettingStore().isSaving = true

@@ -14,11 +14,13 @@ import (
 
 func (a *App) LocateThumbnail(oldThumb, name string) string {
 	// Get thumbnail file
-	dir := a.GetFileDir("Locate Thumbnail File", 
-                        "",
-						"Images (*.png;*.jpg;*.gif;*.webp)", 
-						"*.png;*jpg;*.gif;*.webp")
-	if strings.TrimSpace(dir) == "" { return "" }
+	dir := a.GetFileDir("Locate Thumbnail File", "", []runtime.FileFilter{
+        {
+            DisplayName: "Images (*.png;*.jpg;*.gif;*.webp)",
+            Pattern: "*.png;*jpg;*.gif;*.webp",
+        },
+    })
+    if strings.TrimSpace(dir) == "" { return "" }
 
 	// Create new file name
 	ext := filepath.Ext(dir)
@@ -37,10 +39,12 @@ func (a *App) LocateThumbnail(oldThumb, name string) string {
 
 func (a *App) LocateExecutive(pos string) string {
 	// Get executive file
-	dir := a.GetFileDir("Locate Executive File", 
-						pos,
-						"Executive (*.exe)", 
-						"*.exe")
+	dir := a.GetFileDir("Locate Executive File", pos, []runtime.FileFilter{
+        {
+            DisplayName: "Executive (*.exe)",
+            Pattern: "*.exe",
+        },
+    })
 	return dir
 }
 
@@ -61,19 +65,7 @@ func (a *App) LoadMetadata() interface{} {
 	return data
 }
 
-func (a *App) DeleteGame(name, dir, thumb string) bool {
-	res, err := runtime.MessageDialog(a.ctx, runtime.MessageDialogOptions{
-		Type: runtime.QuestionDialog,
-		Title: "Warning",
-		Message: fmt.Sprintf("You are about to delete %s.\nDo you want to continue?", name),
-		DefaultButton: "No",
-	})
-	if err != nil { res = "No" }
-
-	if res == "Yes" {
-		os.RemoveAll(dir)
-		os.Remove(thumb)
-		return true
-	}
-	return false
+func (a *App) DeleteGame(dir, thumb string) {
+    os.RemoveAll(dir)
+    os.Remove(thumb)
 }

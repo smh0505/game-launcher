@@ -1,5 +1,5 @@
 <template>
-    <draggable id="inventory" v-model="items.items" :group="game" handle=".handle" 
+    <draggable id="inventory" :style="getGap" v-model="items.items" :group="game" handle=".handle" 
         item-key="index" animation="200" @end="resolveIndex">
         <template #item="{_, index}">
             <Item :index="index"></Item>
@@ -20,6 +20,9 @@ export default {
         game: {} as Game
     }),
     components: { Item, draggable },
+    computed: {
+        getGap() { return { gap: this.setting.isListview ? "8px" : "24px" } }
+    },
     methods: {
         resolveIndex() {
             this.setting.isSaving = true
@@ -38,7 +41,6 @@ export default {
     align-items: start;
     flex-wrap: wrap;
 
-    gap: 24px;
     padding: 24px;
     padding-bottom: 110px;
 

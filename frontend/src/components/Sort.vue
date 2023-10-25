@@ -8,16 +8,21 @@
         <a @click="items.sortItems('name', isReversed)">Name</a>
         <a @click="items.sortItems('code', isReversed)">Caption</a>
         <a @click="items.sortItems('isPlayed', isReversed)">Played</a>
+        <a @click="setting.isListview = !setting.isListview">
+            {{ setting.isListview ? "List" : "Gallery" }}
+        </a>
     </div>
 </template>
 
 <script lang="ts">
 import { useItemStore } from '../stores/ItemStore.js'
+import { useSettingStore } from '../stores/SettingStore.js'
 
 export default {
     data: () => ({
         isReversed: false,
-        items: useItemStore()
+        items: useItemStore(),
+        setting: useSettingStore()
     })
 }
 </script>
@@ -29,7 +34,7 @@ export default {
     justify-content: left;
     z-index: 99;
 
-    width: calc(100% - 150px);
+    width: calc(100% - 200px);
     height: 40px;
 
     border-right: 4px solid oklch(40% var(--chroma) var(--hue));
@@ -50,6 +55,11 @@ export default {
         &:hover {
             background-color: white;
             color: black;
+        }
+
+        &:last-child {
+            position: absolute;
+            right: 0px;
         }
     }
 }

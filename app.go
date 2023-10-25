@@ -3,13 +3,14 @@ package main
 import (
 	"context"
 	"fmt"
+	"log"
 	"os"
 	"os/exec"
 	"path/filepath"
 	"strings"
 	"time"
 
-	
+	"github.com/goccy/go-yaml"
 	"github.com/wailsapp/wails/v2/pkg/runtime"
 )
 
@@ -27,28 +28,58 @@ func NewApp() *App {
 // so we can call the runtime methods
 func (a *App) startup(ctx context.Context) {
 	a.ctx = ctx
+
+    bytes, err := os.ReadFile("config.yml")
+    if err != nil { return }
+
+    var config struct{
+        Width int
+        Height int
+        IsMaximized bool
+    }
+    yaml.Unmarshal(bytes, &config)
+
+    if config.IsMaximized {
+        runtime.WindowMaximise(a.ctx)
+    } else {
+        runtime.WindowSetSize(a.ctx, config.Width, config.Height)
+    }
 }
 
-func (a *App)GetFileDir(title, defaultDir, displayName, pattern string) string {
+func (a *App) shutdown(ctx context.Context) bool {
+    var config struct{
+        Width int
+        Height int
+        IsMaximized bool
+    }
+    config.Width, config.Height = runtime.WindowGetSize(a.ctx)
+    config.IsMaximized = runtime.WindowIsMaximised(a.ctx)
+
+    bytes, err := yaml.Marshal(config)
+    if err != nil {
+        log.Fatal(err)
+    }
+    os.WriteFile("config.yml", bytes, os.FileMode(0777))
+    return false
+}
+
+func (a *App)GetFileDir(title, defaultDir string, filters []runtime.FileFilter) string {
 	dir, _ := runtime.OpenFileDialog(a.ctx, runtime.OpenDialogOptions{
 		Title: title,
 		DefaultDirectory: defaultDir,
-		Filters: []runtime.FileFilter{
-			{
-				DisplayName: displayName,
-				Pattern: pattern,
-			},
-		},
+		Filters: filters,
 	})
 	return dir
 }
 
 func (a *App) OpenImageFile(prev string) string {
 	// Get image file
-	dir := a.GetFileDir("Open Background Image", 
-						"",
-						"Images (*.png;*.jpg;*.gif;*.webp)", 
-						"*.png;*jpg;*.gif;*.webp")
+	dir := a.GetFileDir("Open Background Image", "", []runtime.FileFilter{
+        {
+            DisplayName: "Images (*.png;*.jpg;*.gif;*.webp)",
+            Pattern: "*.png;*jpg;*.gif;*.webp",
+        },
+    })
 	if strings.TrimSpace(dir) == "" { return "" }
 
 	// Create new file name
@@ -79,11 +110,5 @@ func (a *App) RenameFolder(name, oldDir, oldExe string) map[string]string {
 }
 
 func (a *App) Start(dir string) {
-	if err := exec.Command(dir).Start(); err != nil {
-		runtime.MessageDialog(a.ctx, runtime.MessageDialogOptions{
-			Type: runtime.ErrorDialog,
-			Title: "Internal Error",
-			Message: fmt.Sprintf("Error: %s", err.Error()),
-		})
-	}
+	exec.Command(dir).Start()
 }

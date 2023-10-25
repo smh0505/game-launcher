@@ -25,6 +25,64 @@ html, body {
     align-items: center;
 }
 
-input[type=text]:focus {
-    outline: none;
+input[type=text]:focus { outline: none; }
+
+.modal-info {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
 }
+
+.modal-info h1 {
+    font: bold 32pt "Pretendard-Regular", sans-serif;
+    text-shadow: 2px 2px 4px red, -2px -2px 4px red;
+}
+
+.modal-info p {
+    font: 16pt "Pretendard-Regular", sans-serif;
+    word-break: break-word;
+}
+
+.modal-info input[type=range] { width: 100%; }
+.modal-info label { font: 16pt "Pretendard-Regular", sans-serif; }
+
+/* Item.vue */
+
+.modal-info .thumbnail {
+    width: 100%;
+    height: 160px;
+    object-fit: cover;
+
+    border: 2px solid black;
+    border-radius: 8px;
+}
+
+.modal-info .game-row {
+    display: flex;
+    width: 100%;
+    gap: 8px;
+}
+
+.modal-info .game-row a {
+    display: flex;
+    padding: 4px;
+    border-radius: 8px;
+    transition: background 0.2s ease;
+}
+
+.modal-info .game-row a:hover { background-color: gray; }
+
+.modal-info .game-input {
+    width: 100%;
+    height: 32px;
+    font: 16pt "Pretendard-Regular", sans-serif;
+    padding-inline: 6px;
+
+    border: 2px solid black;
+    border-radius: 8px;
+    transition: box-shadow 0.2s ease;
+    cursor: default !important;
+}
+
+.modal-info .game-input:focus { box-shadow: 1px 1px 4px black, -1px -1px 4px black; }
+.modal-info .game-input:read-only { text-overflow: ellipsis; }
