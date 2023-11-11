@@ -4,6 +4,7 @@ go 1.18
 
 require (
 	github.com/goccy/go-yaml v1.11.2
+	github.com/skratchdot/open-golang v0.0.0-20200116055534-eef842397966
 	github.com/wailsapp/wails/v2 v2.6.0
 )
 

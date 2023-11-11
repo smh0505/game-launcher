@@ -41,8 +41,8 @@ func (a *App) LocateExecutive(pos string) string {
 	// Get executive file
 	dir := a.GetFileDir("Locate Executive File", pos, []runtime.FileFilter{
         {
-            DisplayName: "Executive (*.exe)",
-            Pattern: "*.exe",
+            DisplayName: "Executive (*.exe;*.lnk;*.html)",
+            Pattern: "*.exe;*.lnk;*.html",
         },
     })
 	return dir

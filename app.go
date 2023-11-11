@@ -5,12 +5,12 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"os/exec"
 	"path/filepath"
 	"strings"
 	"time"
 
 	"github.com/goccy/go-yaml"
+	"github.com/skratchdot/open-golang/open"
 	"github.com/wailsapp/wails/v2/pkg/runtime"
 )
 
@@ -110,5 +110,5 @@ func (a *App) RenameFolder(name, oldDir, oldExe string) map[string]string {
 }
 
 func (a *App) Start(dir string) {
-	exec.Command(dir).Start()
+	open.Start(dir)
 }
